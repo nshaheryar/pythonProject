@@ -19,13 +19,18 @@ def available_rooms():
 def booking_room():
     room_type = input("Which room do you want?: ")
     nights = int(input("How many nights will you be staying?: "))
+    check_in = input("Enter check-in date (YYYY-MM-DD): ")
+    check_out = (datetime.datetime.strptime(check_in, "%Y-%m-%d") + datetime.timedelta(days=nights)).strftime("%Y-%m-%d")
     if room_type.upper() in hotel:
         room_info = hotel[room_type.upper()]
-        if room_info['available'] > 0:
-            total_cost = room_info['rate'] * nights
-            room_info['available'] -= 1
-            print(f"Booking successful! The {room_type.capitalize()} room has been booked for {nights} night(s).")
-            print(f"Your total cost will be: ${total_cost:.2f}")
+        if room_available(room_type, check_in, check_out):
+            room_info = hotel[room_type]
+            if room_info['available'] > 0:
+                total_cost = room_info['rate'] * nights
+                room_info['available'] -= 1  # Deduct one room from availability
+                room_bookings[room_type].append({"check_in": check_in, "check_out": check_out})  # Track booking dates
+                print(f"\nBooking successful! The {room_type} room has been booked from {check_in} to {check_out}.")
+                print(f"Your total cost will be: ${total_cost:.2f}\n")
             availability = input("Would you like to see updated availability, Y/N?: ")
             if availability.lower() == 'y':
                 available_rooms()
