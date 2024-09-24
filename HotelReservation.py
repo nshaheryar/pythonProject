@@ -1,39 +1,51 @@
 import datetime
 
-
 hotel = {
-    "BASIC":{"total_rooms":500,"available":500,"rate":79.99},
-    "FAMILY":{"total_rooms":400,"available":400,"rate":99.99},
-    "SUITE":{"total_rooms":200,"available":200,"rate":150},
-    "PENTHOUSE":{"total_rooms":40,"available":40,"rate":450}
-    }
+    "BASIC": {"total_rooms": 500, "available": 500, "rate": 79.99},
+    "FAMILY": {"total_rooms": 400, "available": 400, "rate": 99.99},
+    "SUITE": {"total_rooms": 200, "available": 200, "rate": 150},
+    "PENTHOUSE": {"total_rooms": 40, "available": 40, "rate": 450}
+}
+
+room_bookings = {room_type: [] for room_type in hotel}
 
 def available_rooms():
     print("-" * 16)
     print("Available Rooms: ")
-    print("=" * 47)
     for room_type, details in hotel.items():
-        print(f"{room_type} Rooms: {details['available']} available, Rate: ${details['rate']}/night")
-        print("=" * 47)
+        print(f"{room_type}: {details['available']} available, Rate: ${details['rate']}/night")
+
+def room_available(room_type, check_in, check_out):
+    for booking in room_bookings[room_type]:
+        if not (check_out <= booking["check_in"] or check_in >= booking["check_out"]):
+            return False
+    return True
 
 def booking_room():
-    room_type = input("Which room do you want?: ")
+    room_type = input("Which room do you want?: ").upper()
     nights = int(input("How many nights will you be staying?: "))
-    check_in = input("Enter check-in date (YYYY-MM-DD): ")
-    check_out = (datetime.datetime.strptime(check_in, "%Y-%m-%d") + datetime.timedelta(days=nights)).strftime("%Y-%m-%d")
-    if room_type.upper() in hotel:
-        room_info = hotel[room_type.upper()]
-        if room_available(room_type, check_in, check_out):
-            room_info = hotel[room_type]
-            if room_info['available'] > 0:
-                total_cost = room_info['rate'] * nights
-                room_info['available'] -= 1  # Deduct one room from availability
-                room_bookings[room_type].append({"check_in": check_in, "check_out": check_out})  # Track booking dates
-                print(f"\nBooking successful! The {room_type} room has been booked from {check_in} to {check_out}.")
-                print(f"Your total cost will be: ${total_cost:.2f}\n")
-            availability = input("Would you like to see updated availability, Y/N?: ")
-            if availability.lower() == 'y':
-                available_rooms()
+    check_in = input("Enter check-in date (MM/DD/YYYY): ")
+    
+    # Parse the check-in date using MM/DD/YYYY format
+    check_in_date = datetime.datetime.strptime(check_in, "%m/%d/%Y")
+    
+    # Calculate the check-out date based on the number of nights
+    check_out_date = (check_in_date + datetime.timedelta(days=nights)).strftime("%m/%d/%Y")
+
+    if room_type in hotel and hotel[room_type]['available'] > 0:
+        if room_available(room_type, check_in, check_out_date):
+            hotel[room_type]['available'] -= 1
+            room_bookings[room_type].append({"check_in": check_in, "check_out": check_out_date})
+            total_cost = hotel[room_type]['rate'] * nights
+            print(f"\nBooking successful! The {room_type} room is booked from {check_in} to {check_out_date}.")
+            print(f"Total cost: ${total_cost:.2f}")
+        else:
+            print(f"No availability for the selected dates.")
+    else:
+        print(f"Sorry, {room_type} rooms are not available.")
+
+    if input("See updated availability (Y/N)?: ").lower() == 'y':
+        available_rooms()
 
 available_rooms()
 booking_room()
