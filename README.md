@@ -15,7 +15,8 @@ Upon running the project1.py file for the first time, several things happen:
   - The user will input the number of nights they intend to stay at the hotel
   - The user will input the check-in date for their stay
 
-Once these actions are completed, the user is informed their booking was successful and is asked if they would like a receipt
+Once these actions are completed, the user is informed their booking was successful and is asked if they would like a receipt.
+
 If they type 'y' to accept, their booking details are printed out [Roomtype, checkin/checkout, and cost]
 
 4 types of rooms exist: Basic, Family, Suite, and Penthouse
