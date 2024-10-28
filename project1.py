@@ -33,6 +33,16 @@ class Hotel(DBbase):
                                     check_in DATE,
                                     check_out DATE
                                 );
+                                
+                             CREATE TABLE IF NOT EXISTS reservations (
+                                     reservation_id INTEGER PRIMARY KEY,
+                                     booking_id INTEGER,
+                                     last_name TEXT NOT NULL,
+                                     first_name TEXT NOT NULL, 
+                                     billing_zip INTEGER NOT NULL,
+                                     date_of_birth DATE,
+                                    FOREIGN KEY (booking_id) REFERENCES bookings(id)
+                                    );
                             """)
 
         #ensures rooms table has correct columns
@@ -200,6 +210,22 @@ class Hotel(DBbase):
                     print(f"Invalid room type '{room_type}'. Please choose a valid room type.")
             except ValueError:
                 print("Invalid date format. Please enter the date in YYYY-MM-DD format.")
+                        
+def add_reservation(self, booking_id, last_name, first_name,date_of_birth, billing_zip):
+        try:
+            # Insert reservation details into the reservations table
+            self.get_cursor.execute("""
+                INSERT INTO reservations (booking_id, last_name, first_name, date_of_birth,billing_zip) 
+                VALUES (?, ?, ?, ?, ?)
+            """, (booking_id, last_name, first_name, date_of_birth, billing_zip))
+            self.get_connection.commit()
+
+            print(f"Reservation added successfully for {first_name} {last_name}.")
+            return self.get_cursor.lastrowid 
+
+        except Exception as e:
+            print(f"An error occurred while adding the reservation: {e}")
+            return None
 
 #Execution flow is as follows:
     #create database file (doesn't need to be commented out after running the first time)
