@@ -201,6 +201,68 @@ class Hotel(DBbase):
             except ValueError:
                 print("Invalid date format. Please enter the date in YYYY-MM-DD format.")
 
+# added delete booking by id if it exists
+def delete_booking(self, booking_id):
+        try:
+            # Check if the booking exists
+            self.get_cursor.execute("SELECT * FROM bookings WHERE id = ?", (booking_id,))
+            booking = self.get_cursor.fetchone()
+
+            if booking:
+                # Delete the booking
+                self.get_cursor.execute("DELETE FROM bookings WHERE id = ?", (booking_id,))
+                self.get_connection.commit()
+                print(f"Booking with ID {booking_id} has been successfully deleted.")
+            else:
+                print(f"No booking found with ID {booking_id}.")
+        except Exception as e:
+            print(f"An error occurred while trying to delete the booking: {e}")
+                    
+# update booking by id if it exists with optional parameters
+ def update_booking(self, booking_id, room_type=None, check_in=None, check_out=None):
+        try:
+            # Check if the booking exists
+            self.get_cursor.execute("SELECT * FROM bookings WHERE id = ?", (booking_id,))
+            booking = self.get_cursor.fetchone()
+
+            if not booking:
+                print(f"No booking found with ID {booking_id}.")
+                return False
+
+            # Prepare the SQL update query
+            update_fields = []
+            params = []
+
+            if room_type:
+                update_fields.append("room_type = ?")
+                params.append(room_type)
+
+            if check_in:
+                update_fields.append("check_in = ?")
+                params.append(check_in)
+
+            if check_out:
+                update_fields.append("check_out = ?")
+                params.append(check_out)
+
+            if not update_fields:
+                print("No fields to update.")
+                return False
+
+            params.append(booking_id)
+                    
+            update_query = f"UPDATE bookings SET {', '.join(update_fields)} WHERE id = ?"
+            self.get_cursor.execute(update_query, params)
+            self.get_connection.commit()
+
+            print(f"Booking with ID {booking_id} has been successfully updated.")
+            return True
+
+        except Exception as e:
+            print(f"An error occurred while trying to update the booking: {e}")
+            return False
+
+
 #Execution flow is as follows:
     #create database file (doesn't need to be commented out after running the first time)
     #populates file with simulated bookings [leaving 10 rooms of each type open]
